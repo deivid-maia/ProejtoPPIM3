@@ -1,0 +1,265 @@
+import express from 'express';
+import path from 'path'; //lidar com as urls 
+
+const porta = 3000;
+const host = '0.0.0.0';
+var listaUsuarios = [];
+
+function processaCadastroUsuario(requisicao, resposta){
+    //extrair os dados do corpo da requisição, além de validar os dados
+
+    const dados = requisicao.body;
+    let conteudoResposta = '';
+    // é necessário validar os dados enviados
+    // a validação dos dados é de responsabilidade da aplicação servidora
+    if (!(dados.nome && dados.telefone && dados.email && dados.senha
+    && dados.confirmarSenha)){
+        //estão faltando dados do usuário
+        conteudoResposta = `
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+        <meta charset="UTF-8">
+        <title>Formulário de Inscrição</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+              
+        </head>
+        <style>
+            body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+        }
+
+        .container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        form {
+            max-width: 600px;
+            width: 100%;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        input[type="text"],
+        input[type="tel"],
+        input[type="email"],
+        input[type="password"] {
+            width: calc(100% - 12px);
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+        }
+
+        button {
+            width: 100%;
+            padding: 10px;
+            border: none;
+            border-radius: 3px;
+            background-color: #333;
+            color: #fff;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #555;
+        }
+
+        button:focus {
+            outline: none;
+        }
+        </style>
+        <body>
+            <div class="container">
+                <form id="form" action='/cadastroUsuario' method='POST'>
+                    <fieldset>
+                        <h2>Formulário de Inscrição</h2>
+                        <div class="form-group">
+                            <label for="nome">Nome</label>
+                            <input type="text" id="nome" name="nome">
+                        </div>
+
+                `;
+
+        if(!dados.nome){
+            conteudoResposta += `<div>
+                        <p style="color:red" font-size: smaller>O campo nome é obrigatório, por favor insira o nome</p>
+                    </div>`;
+        }
+
+        conteudoResposta += `<div class="form-group">
+                        <label for="telefone">Telefone</label>
+                        <input type="tel" id="telefone" name="telefone" value="${dados.telefone}">
+                    </div> `;
+
+        if(!dados.telefone){
+            conteudoResposta += `<div>
+                        <p style="color:red">O campo telefone é obrigatório, por favor insira o telefone</p>
+                    </div>`;
+              
+        }
+
+        conteudoResposta += `<div class="form-group">
+                        <label for="email">Email</label>
+                        <input type="email" id="email" name="email" value="${dados.email}">
+                    </div>`;
+
+        if(!dados.email){
+            conteudoResposta += `<div>
+                         <p style="color:red">O campo e-mail é obrigatório, por favor insira o e-mail</p>
+                    </div>`;
+              
+        }
+
+        conteudoResposta += `<div class="form-group">
+                         <label for="senha">Senha</label>
+                        <input type="password" id="senha" name="senha" value="${dados.senha}">
+                    </div>`;
+
+        if(!dados.senha){
+            conteudoResposta += `<div>
+                        <p style="color:red">O campo senha é obrigatório, por favor insira a senha</p>
+                    </div>`;
+              
+        }
+
+        conteudoResposta += `<div class="form-group">
+                        <label for="confirmar-senha">Confirmar Senha</label>
+                        <input type="password" id="confirmarSenha" name="confirmarSenha" value="${dados.confirmarSenha}">
+                    </div>`;
+
+        if(!dados.confirmarSenha){
+            conteudoResposta += `<div>
+                        <p style="color:red">O campo confirmar a senha é obrigatório, por favor insira a senha novamente</p>
+                    </div>`;
+              
+        }
+        
+        conteudoResposta += `<button type="submit">Inscrever-se</button>
+                            
+                        </fieldset>
+                    </form>
+                </div>
+            </body>
+            </html>`; 
+
+        resposta.end(conteudoResposta);
+        
+    }
+    else{
+
+        const usuario = {
+            nome: dados.nome,
+            telefone: dados.telefone,
+            email: dados.email,
+            senha: dados.senha,
+            confirmarSenha: dados.confirmarSenha
+        }
+
+    //adiciona um novo usuario na lista de usuarios já cadastrados
+    listaUsuarios.push(usuario);
+    //retornar a lista de usuarios
+    let conteudoResposta = `
+    <!DOCTYPE html>
+    <head>
+        <meta charset="UTF-8">
+        <title> Menu do sistema </title>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    </head>
+    <body>
+        <h1>Lista de usuários cadastrados</h1>
+        <table class="table table-dark table-hover">
+            <thead>
+                <tr>
+                    <th>Nome</th>
+                    <th>Telefone</th>
+                    <th>Email</th>
+                    <th>Senha</th>
+                    <th>Confirmar senha</th>
+                </tr>
+            </thead>
+            <tbody>`;
+            
+    for(const usuario of listaUsuarios){
+         conteudoResposta += `
+                        <tr>
+                            <td>${usuario.nome}</td>
+                            <td>${usuario.telefone}</td>
+                            <td>${usuario.email}</td>
+                            <td>${usuario.senha}</td>
+                            <td>${usuario.confirmarSenha}</td>
+                        </tr>
+                    
+                    `;
+    }
+ 
+    conteudoResposta += `
+             </tbody>
+        </table>
+        <a class="btn btn-primary" href="/" role="button">Voltar ao menu</a>
+        <a class="btn btn-primary" href="./cadastroUsuario.html" role="button">Continuar cadastrando</a>
+    </body>
+    </html> `;
+        resposta.end(conteudoResposta);
+    } // final do if/else de validação
+}                    
+
+const app = express();
+
+// ativar a extensão que manipula requisicoes HTTP
+//opcao false ativa a extensão
+// opcap true ativa a extensão qs(manipula objetos(lista, aninhados))
+app.use(express.urlencoded({extended: true}));
+
+//indicando para a aplicação como servir arquivos estáticos localizados na pasta 'paginas'
+app.use(express.static(path.join(process.cwd(),'./paginas'))); // junto com a biblioteca path, faz a correção da localização da pasta pro deploy no vercel
+
+app.get('/', (requisicao, resposta) => {
+    resposta.end(`
+        <!DOCTYPE html>
+            <head>
+                <meta charset="UTF-8">
+                <title> Menu do sistema </title>
+            </head>
+            <body>
+                <h1> MENU </h1>
+                <ul>
+                    <li> <a href="/cadastroUsuario.html"> Cadastrar Usuário </a> </li>
+                </ul>
+            </body>
+        </html>
+        
+    `);
+});
+
+//rota para processar o cadastro de usuarios endpoint = '/cadastroUsuario'
+app.post('/cadastroUsuario', processaCadastroUsuario);
+
+
+app.listen(porta, host, () => {
+    console.log(`Servidor executando na url http://${host}:${porta}`);
+
+});
