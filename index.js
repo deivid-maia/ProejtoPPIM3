@@ -32,7 +32,7 @@ function processaCadastroUsuario(requisicao, resposta){
                         <h2>Formulário de Inscrição</h2>
                         <div class="form-group">
                             <label for="nome">Nome</label>
-                            <input type="text" id="nome" name="nome" value="${dados.nome}" required>
+                            <input type="text" id="nome" name="nome" value="${dados.nome}">
                         </div>
         `;
 
@@ -46,7 +46,7 @@ function processaCadastroUsuario(requisicao, resposta){
         conteudoResposta +=`
                     <div class="form-group">
                         <label for="telefone">Telefone</label>
-                        <input type="tel" id="telefone" name="telefone" value="${dados.telefone}" required>
+                        <input type="tel" id="telefone" name="telefone" value="${dados.telefone}">
                     </div> `;
         if(!dados.telefone){
             conteudoResposta +=`
@@ -59,7 +59,7 @@ function processaCadastroUsuario(requisicao, resposta){
         conteudoResposta +=`
                     <div class="form-group">
                         <label for="email">Email</label>
-                        <input type="email" id="email" name="email" value="${dados.email}" required>
+                        <input type="email" id="email" name="email" value="${dados.email}">
                     </div>`;
         if(!dados.email){
             conteudoResposta +=`
@@ -72,7 +72,7 @@ function processaCadastroUsuario(requisicao, resposta){
         conteudoResposta +=`
                     <div class="form-group">
                          <label for="senha">Senha</label>
-                        <input type="password" id="senha" name="senha" value="${dados.senha}" required>
+                        <input type="password" id="senha" name="senha" value="${dados.senha}">
                     </div>`;
         if(!dados.senha){
             conteudoResposta +=`
@@ -85,7 +85,7 @@ function processaCadastroUsuario(requisicao, resposta){
         conteudoResposta +=`
                     <div class="form-group">
                         <label for="confirmar-senha">Confirmar Senha</label>
-                        <input type="password" id="confirmarSenha" name="confirmarSenha" value="${dados.confirmarSenha}" required>
+                        <input type="password" id="confirmarSenha" name="confirmarSenha" value="${dados.confirmarSenha}">
                     </div>`;
         if(!dados.confirmarSenha){
             conteudoResposta +=`
@@ -117,7 +117,7 @@ function processaCadastroUsuario(requisicao, resposta){
         telefone: dados.telefone,
         email: dados.email,
         senha: dados.senha,
-        confirmarSenha: dados.confirmarSenha,
+        confirmarSenha: dados.confirmarSenha
     }
 
     //adiciona um novo usuario na lista de usuarios já cadastrados
